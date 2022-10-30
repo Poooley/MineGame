@@ -2,9 +2,9 @@
 {
     public interface IConfig
     {
-        public byte Fields { get; }
-        public byte Width { get; }
-        public byte Mines { get; }
-        
+        int Fields { get; }
+        byte Length { get; }
+        byte Mines { get; }
+        byte Width { get; }
     }
 }

@@ -3,16 +3,20 @@
 namespace Minegame.Services;
 public class Config : IConfig
 {
-    IConfiguration _config;
-    byte _fields;
-    byte _width;
-    byte _mines;
+    readonly byte _width;
+    readonly byte _length;
+    readonly int _fields;
+    readonly byte _mines;
     public Config(IConfiguration config)
     {
-        _config = config;
+        _length = config.GetValue<byte>("Length");
+        _width = config.GetValue<byte>("Width");
+        _fields = _length * _width;
+        _mines = config.GetValue<byte>("Mines");
     }
 
-    public byte Fields { get => _config.GetValue<byte>("Fields"); }
-    public byte Width { get => _config.GetValue<byte>("Width"); }
-    public byte Mines { get => _config.GetValue<byte>("Mines"); }
+    public int Fields { get => _fields; }
+    public byte Width { get => _width; }
+    public byte Length { get => _length; }
+    public byte Mines { get => _mines; }
 }

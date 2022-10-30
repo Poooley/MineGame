@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Minegame.Interfaces;
-using Minegame.Services;
 
 namespace Minegame;
 internal class Program

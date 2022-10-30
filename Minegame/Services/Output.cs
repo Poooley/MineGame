@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,25 +10,48 @@ namespace Minegame.Services;
 
 internal class Output : IOutput
 {
-    public void SetPlayingField(byte width, double length)
+    private readonly IConfig _config;
+    public Output(IConfig config)
     {
-        for (int i = 0; i < length; i++)
+        _config = config;
+    }
+
+    public byte GetUserInput()
+    {
+        var min = 1;
+        while (true)
         {
-            for (int y = 0; y < width; y++)
+            Console.Write($"\nWas ist Ihr nächster Zug? Geben Sie eine Zahl zwischen {min} und {_config.Width} ein. ");
+            if (byte.TryParse(Console.ReadLine(), out byte input))
             {
-                Console.Write("X ");
+                if (input >= min && input <= _config.Width)
+                {
+                    return --input;
+                }
             }
-            Console.WriteLine();
         }
     }
 
-    public void Write(string input)
+    public void SetPlayingField(byte currentRow, Field[] fields, bool showMines = false)
     {
-        throw new NotImplementedException();
-    }
-
-    public void WriteLine(string input)
-    {
-        throw new NotImplementedException();
+        currentRow++;
+        Console.WriteLine("Das Spielfeld" + (showMines ? " inkl. Minen war:" : ":") + "\n");
+        for (int row = 0; row < currentRow; row++)
+        {
+            for (int column = 0; column < _config.Width; column++)
+            {
+                var curPos = (row * _config.Width) + column;
+                
+                if (fields[curPos].IsFlagged && fields[curPos].IsMine)
+                    Console.Write("T ");
+                else if (fields[curPos].IsFlagged)
+                    Console.Write("O ");
+                else if (showMines && fields[curPos].IsMine)
+                    Console.Write("M ");
+                else
+                    Console.Write("X ");
+            }
+            Console.WriteLine();
+        }
     }
 }

@@ -7,6 +7,9 @@ internal class GameManager : IGameManager
 {
     private readonly IOutput _console;
     private readonly IConfig _configuration;
+    private Field[] fields;
+    private byte currentRow = 0;
+
     public GameManager(IOutput console, IConfig config)
     {
         _console = console;
@@ -15,47 +18,90 @@ internal class GameManager : IGameManager
 
     public void Start()
     {
-        Console.WriteLine("Welcome to the Game!");
+        Console.Clear();
+        Console.WriteLine("Welcome to the Game!\n");
         InitializeGame();
     }
 
     public void Stop()
     {
-        throw new NotImplementedException();
-    }
-
-    public void Update()
-    {
-        throw new NotImplementedException();
-    }
-    private void IsWin()
-    {
+        _console.SetPlayingField((byte)(_configuration.Length - 1), fields, true);
+        Console.Write("\nNoch eine Runde? (j/n)? ");
         
-    }
-    private void IsLose()
-    {
-        
-    }
-    private void IsDraw()
-    {
-        
-    }
-    private void InitializeGame()
-    {
-        Field[] fields = new Field[_configuration.Fields];
-
-        var length = _configuration.Fields / _configuration.Width;
-
-        _console.SetPlayingField(_configuration.Width, length);
-
-        for (int i = 0; i < _configuration.Width; i++) 
+        if (Console.ReadLine().ToLower().Equals("j"))
         {
-            for (int j = 0; j < length; j++)
-            {
-                _console.Write("X");
-            }
-            _console.WriteLine("");
+            InitializeGame();
+        }
+        else
+        {
+            Environment.Exit(0);
         }
     }
 
+    public void Move()
+    {
+        while (true)
+        {
+            Console.Clear();
+            _console.SetPlayingField(currentRow, fields);
+            var userInput = _console.GetUserInput();
+
+            var curPos = (currentRow * _configuration.Width) + userInput;
+            fields[curPos].IsFlagged = true;
+
+            if (fields[curPos].IsMine)
+                IsLose();
+            
+            if (currentRow == _configuration.Length - 1)
+                IsWin();
+
+            currentRow++;
+        }
+
+    }
+    private void IsWin()
+    {
+        Console.Clear();
+        Console.WriteLine("Sie haben gewonnen! Glückwunsch!");
+        Stop();
+    }
+    private void IsLose()
+    {
+        Console.Clear();
+        Console.WriteLine("Leider verloren!");
+        Stop();
+    }
+    private void InitializeGame()
+    {
+        fields = InitializeFields();
+        currentRow = 0;
+        Move();
+    }
+
+    private Field[] InitializeFields()
+    {
+        var fields = new Field[_configuration.Fields];
+
+        // Initialize fields
+        for (int i = 0; i < fields.Length; i++)
+        {
+            fields[i] = new Field();
+        }
+
+        var mines = _configuration.Mines;
+        var random = new Random();
+        
+        // Set all mines to fields
+        while (mines > 0)
+        {
+            var field = random.Next(0, _configuration.Fields);
+            if (!fields[field].IsMine)
+            {
+                fields[field].IsMine = true;
+                mines--;
+            }
+        }
+
+        return fields;
+    }
 }
