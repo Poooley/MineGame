@@ -89,6 +89,7 @@ internal class Output : IOutput
 
         for (int row = 0; row < currentRow; row++)
         {
+            Console.Write("\t");
             for (int column = 0; column < _settings.Width; column++)
             {
                 var curPos = (row * _settings.Width) + column;
