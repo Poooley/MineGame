@@ -19,7 +19,6 @@ internal class GameManager : IGameManager
     public void Start()
     {
         Console.Clear();
-        Console.WriteLine("Welcome to the Game!\n");
         InitializeGame();
     }
 
@@ -28,7 +27,7 @@ internal class GameManager : IGameManager
         _console.SetPlayingField((byte)(_configuration.Length - 1), fields, true);
         Console.Write("\nNoch eine Runde? (j/n)? ");
         
-        if (Console.ReadLine().ToLower().Equals("j"))
+        if (!Console.ReadLine().ToLower().Equals("n"))
         {
             InitializeGame();
         }
