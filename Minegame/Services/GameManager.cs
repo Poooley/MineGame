@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using System.Runtime.CompilerServices;
+﻿using Microsoft.Extensions.Options;
 
 namespace Minegame.Services;
 
@@ -9,8 +7,8 @@ internal class GameManager : IGameManager
     private readonly IOutput _console;
     private MySettings _settings;
     private Field[] fields;
-    private byte currentRow = 0;
-
+    private int currentRow = 0;
+    
     public GameManager(IOutput console, IOptionsSnapshot<MySettings> settings = null)
     {
         _console = console;
@@ -19,14 +17,13 @@ internal class GameManager : IGameManager
 
     public void Start()
     {
-        Console.Clear();
         InitializeGame();
     }
 
     public void Stop()
     {
         Console.Write("\nNoch eine Runde? (j/n)? ");
-        
+
         if (!Console.ReadLine().ToLower().Equals("n"))
         {
             InitializeGame();
@@ -37,15 +34,20 @@ internal class GameManager : IGameManager
         }
     }
 
-    public void Move()
+    public void Move(bool isFirstRound = true)
     {
+        int lastPos = 0;
         while (true)
         {
             Console.Clear();
-            _console.SetPlayingField(currentRow, fields);
-            var userInput = _console.GetUserInput();
 
-            var curPos = (currentRow * _settings.Width) + userInput;
+            _console.SetPlayingField(currentRow, fields);
+            
+            var curPos = isFirstRound ? _console.GetUserInputFirstRound() : _console.GetUserInput(lastPos);
+            
+            lastPos = curPos;
+            
+
             fields[curPos].IsFlagged = true;
 
             if (fields[curPos].IsMine)
@@ -54,9 +56,9 @@ internal class GameManager : IGameManager
             if (currentRow == _settings.Length - 1)
                 IsWin();
 
+            isFirstRound = false;
             currentRow++;
         }
-
     }
     private void IsWin()
     {
@@ -72,7 +74,7 @@ internal class GameManager : IGameManager
     private void SetFinishText(string text)
     {
         Console.Clear();
-        _console.SetPlayingField((byte)(_settings.Length - 1), fields, true);
+        _console.SetPlayingField(_settings.Length - 1, fields, true);
 
         Console.ForegroundColor = ConsoleColor.Magenta;
         Console.WriteLine($"\n----- {text} -----");
@@ -84,6 +86,7 @@ internal class GameManager : IGameManager
     {
         fields = InitializeFields();
         currentRow = 0;
+        
         Move();
     }
 

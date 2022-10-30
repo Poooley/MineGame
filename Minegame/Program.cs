@@ -6,7 +6,7 @@ using System.Configuration;
 namespace Minegame;
 internal class Program
 {
-    static async Task Main(string[] args)
+    static void Main(string[] args)
     {
         using IHost host = Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration(config => config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true))

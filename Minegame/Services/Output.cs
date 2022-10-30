@@ -12,12 +12,60 @@ namespace Minegame.Services;
 internal class Output : IOutput
 {
     private readonly MySettings _settings;
+    int[] leftFields;
+    int[] rightFields;
     public Output(IOptionsSnapshot<MySettings> settings = null)
     {
         _settings = settings.Value;
+        leftFields = Enumerable.Range(0, _settings.Length).Select(x => (x * _settings.Width)).ToArray();
+        rightFields = Enumerable.Range(0, _settings.Length).Select(x => ((x * _settings.Width) + _settings.Width -1)).ToArray();
+    }
+        
+    public int GetUserInput(int curPos)
+    {
+        bool leftNotAllowed = leftFields.Any(x => x == curPos);
+        bool rightNotAllowed = rightFields.Any(x => x == curPos);
+
+        while (true)
+        {
+            var allowedKeys = new List<ConsoleKey>();
+            if (leftNotAllowed)
+            {
+                Console.Write($"\nWas ist Ihr nächster Zug? Pfeiltasten erlaubt: ► ▼ ");
+                allowedKeys.Add(ConsoleKey.RightArrow);
+                allowedKeys.Add(ConsoleKey.DownArrow);
+            }
+            else if (rightNotAllowed)
+            {
+                Console.Write($"\nWas ist Ihr nächster Zug? Pfeiltasten erlaubt: ◄ ▼ ");
+                allowedKeys.Add(ConsoleKey.LeftArrow);
+                allowedKeys.Add(ConsoleKey.DownArrow);
+            }
+            else
+            {
+                Console.Write($"\nWas ist Ihr nächster Zug? Pfeiltasten erlaubt: ◄ ▼ ► ");
+                allowedKeys.Add(ConsoleKey.RightArrow);
+                allowedKeys.Add(ConsoleKey.LeftArrow);
+                allowedKeys.Add(ConsoleKey.DownArrow);
+            }
+
+            // get Cursor keys input
+            var key = Console.ReadKey(true);
+
+            if (!allowedKeys.Contains(key.Key))
+                continue;
+
+            return key.Key switch
+            {
+                ConsoleKey.RightArrow => curPos + 1 + _settings.Width,
+                ConsoleKey.LeftArrow => curPos - 1 + _settings.Width,
+                ConsoleKey.DownArrow => curPos + _settings.Width,
+                _ => curPos
+            };
+        }
     }
 
-    public byte GetUserInput()
+    public byte GetUserInputFirstRound()
     {
         var min = 1;
         while (true)
@@ -33,7 +81,7 @@ internal class Output : IOutput
         }
     }
 
-    public void SetPlayingField(byte currentRow, Field[] fields, bool showMines = false)
+    public void SetPlayingField(int currentRow, Field[] fields, bool showMines = false)
     {
         SetGameText(showMines);
 

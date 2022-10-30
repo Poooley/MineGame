@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace Minegame.Interfaces;
 interface IOutput
 {
-    byte GetUserInput();
-    public void SetPlayingField(byte currentRow, Field[] fields, bool showMines = false);
+    int GetUserInput(int curPos);
+    byte GetUserInputFirstRound();
+    public void SetPlayingField(int currentRow, Field[] fields, bool showMines = false);
 }
 
