@@ -24,7 +24,6 @@ internal class GameManager : IGameManager
 
     public void Stop()
     {
-        _console.SetPlayingField((byte)(_configuration.Length - 1), fields, true);
         Console.Write("\nNoch eine Runde? (j/n)? ");
         
         if (!Console.ReadLine().ToLower().Equals("n"))
@@ -60,16 +59,26 @@ internal class GameManager : IGameManager
     }
     private void IsWin()
     {
-        Console.Clear();
-        Console.WriteLine("Sie haben gewonnen! Glückwunsch!");
+        SetFinishText("Sie haben gewonnen! Glückwunsch!");
         Stop();
     }
     private void IsLose()
     {
-        Console.Clear();
-        Console.WriteLine("Leider verloren!");
+        SetFinishText("Sie haben leider verloren! Versuchen Sie es erneut!");
         Stop();
     }
+
+    private void SetFinishText(string text)
+    {
+        Console.Clear();
+        _console.SetPlayingField((byte)(_configuration.Length - 1), fields, true);
+
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine($"\n----- {text} -----");
+        Console.ForegroundColor = ConsoleColor.Gray;
+
+    }
+
     private void InitializeGame()
     {
         fields = InitializeFields();

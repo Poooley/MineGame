@@ -46,7 +46,7 @@ internal class Output : IOutput
 
                 if (fields[curPos].IsFlagged && fields[curPos].IsMine)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.Write("T ");
                 }
                 else if (fields[curPos].IsFlagged)
@@ -80,9 +80,10 @@ internal class Output : IOutput
             > 10 => new Difficulty() { Name = "Mittel", Color = ConsoleColor.Magenta },
             _ => new Difficulty() { Name = "Leicht", Color = ConsoleColor.Yellow },
         };
+
         Console.ForegroundColor = difficulty.Color;
-        Console.WriteLine($"Eingestellter Schwierigkeitsgrad: {difficulty.Name} {difficultyInPercent}%\n" +
-            $"(M: {_config.Mines}, F: {_config.Fields})\n\n");
+        Console.WriteLine($"Eingestellter Schwierigkeitsgrad: {difficulty.Name} {difficultyInPercent}%");
+        Console.WriteLine($"(M: {_config.Mines}, F: {_config.Fields})\n\n");
         Console.ForegroundColor = ConsoleColor.Gray;
 
         Console.WriteLine("Das Spielfeld" + (showMines ? " inkl. Minen war:" : ":") + "\n");
