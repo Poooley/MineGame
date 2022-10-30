@@ -14,8 +14,8 @@ internal class Program
             {
                 services.AddSingleton<IGameManager, GameManager>();
                 services.AddSingleton<IOutput, Output>();
-                services.Configure<MySettings>(context.Configuration);
-                services.Configure<MySettings>((settings) =>
+                services.Configure<Settings>(context.Configuration);
+                services.Configure<Settings>((settings) =>
                 {
                     settings.Fields = settings.Length * settings.Width;
                 });

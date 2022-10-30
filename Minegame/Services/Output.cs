@@ -11,10 +11,10 @@ namespace Minegame.Services;
 
 internal class Output : IOutput
 {
-    private readonly MySettings _settings;
+    private readonly Settings _settings;
     int[] leftFields;
     int[] rightFields;
-    public Output(IOptionsSnapshot<MySettings> settings = null)
+    public Output(IOptionsSnapshot<Settings> settings = null)
     {
         _settings = settings.Value;
         leftFields = Enumerable.Range(0, _settings.Length).Select(x => (x * _settings.Width)).ToArray();
@@ -126,8 +126,8 @@ internal class Output : IOutput
 
         var difficulty = difficultyInPercent switch
         {
-            > 20 => new Difficulty() { Name = "Schwer", Color = ConsoleColor.Red },
-            > 10 => new Difficulty() { Name = "Mittel", Color = ConsoleColor.Magenta },
+            > 10 => new Difficulty() { Name = "Schwer", Color = ConsoleColor.Red },
+            > 5 => new Difficulty() { Name = "Mittel", Color = ConsoleColor.Magenta },
             _ => new Difficulty() { Name = "Leicht", Color = ConsoleColor.Yellow },
         };
 

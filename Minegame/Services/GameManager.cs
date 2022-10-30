@@ -5,11 +5,11 @@ namespace Minegame.Services;
 internal class GameManager : IGameManager
 {
     private readonly IOutput _console;
-    private MySettings _settings;
+    private Settings _settings;
     private Field[] fields;
     private int currentRow = 0;
     
-    public GameManager(IOutput console, IOptionsSnapshot<MySettings> settings = null)
+    public GameManager(IOutput console, IOptionsSnapshot<Settings> settings = null)
     {
         _console = console;
         _settings = settings.Value;

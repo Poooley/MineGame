@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 
 namespace Minegame.Models;
-public class MySettings
+public class Settings
 {
     public int Fields { get; set; }
     public byte Width { get; set; }
