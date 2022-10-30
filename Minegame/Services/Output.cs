@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,10 @@ namespace Minegame.Services;
 
 internal class Output : IOutput
 {
-    private readonly IConfig _config;
-    public Output(IConfig config)
+    private readonly MySettings _settings;
+    public Output(IOptionsSnapshot<MySettings> settings = null)
     {
-        _config = config;
+        _settings = settings.Value;
     }
 
     public byte GetUserInput()
@@ -21,10 +22,10 @@ internal class Output : IOutput
         var min = 1;
         while (true)
         {
-            Console.Write($"\nWas ist Ihr nächster Zug? Geben Sie eine Zahl zwischen {min} und {_config.Width} ein. ");
+            Console.Write($"\nWas ist Ihr nächster Zug? Geben Sie eine Zahl zwischen {min} und {_settings.Width} ein. ");
             if (byte.TryParse(Console.ReadLine(), out byte input))
             {
-                if (input >= min && input <= _config.Width)
+                if (input >= min && input <= _settings.Width)
                 {
                     return --input;
                 }
@@ -40,9 +41,9 @@ internal class Output : IOutput
 
         for (int row = 0; row < currentRow; row++)
         {
-            for (int column = 0; column < _config.Width; column++)
+            for (int column = 0; column < _settings.Width; column++)
             {
-                var curPos = (row * _config.Width) + column;
+                var curPos = (row * _settings.Width) + column;
 
                 if (fields[curPos].IsFlagged && fields[curPos].IsMine)
                 {
@@ -72,7 +73,7 @@ internal class Output : IOutput
 
     private void SetGameText(bool showMines)
     {
-        var difficultyInPercent = Math.Round((double)_config.Mines / _config.Fields * 100, 0);
+        var difficultyInPercent = Math.Round((double)_settings.Mines / _settings.Fields * 100, 0);
 
         var difficulty = difficultyInPercent switch
         {
@@ -83,7 +84,7 @@ internal class Output : IOutput
 
         Console.ForegroundColor = difficulty.Color;
         Console.WriteLine($"Eingestellter Schwierigkeitsgrad: {difficulty.Name} {difficultyInPercent}%");
-        Console.WriteLine($"(M: {_config.Mines}, F: {_config.Fields})\n\n");
+        Console.WriteLine($"(M: {_settings.Mines}, F: {_settings.Fields})\n\n");
         Console.ForegroundColor = ConsoleColor.Gray;
 
         Console.WriteLine("Das Spielfeld" + (showMines ? " inkl. Minen war:" : ":") + "\n");
