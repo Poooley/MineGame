@@ -2,7 +2,7 @@
 
 public static class KeysFactory
 {
-    public static IDictionary<EnabledKey, EnabledKeys> GetEnabledKeys()
+    public static IDictionary<EnabledKey, EnabledKeys> GetDefaultKeys()
     {
         EnabledKeys leftHandSide = new EnabledKeys()
         {
@@ -30,6 +30,18 @@ public static class KeysFactory
             { EnabledKey.All, allFields },
             { EnabledKey.Right, rightHandSide }
         };
+    }
+
+    public static EnabledKeys GetEnabledKeys(IDictionary<EnabledKey, EnabledKeys> enabledKeys, 
+        bool leftNotAllowed, bool rightNotAllowed)
+    {
+        if (leftNotAllowed)
+            return enabledKeys[EnabledKey.Left];
+        
+        if (rightNotAllowed)
+            return enabledKeys[EnabledKey.Right];
+        
+        return enabledKeys[EnabledKey.All];
     }
 }
 

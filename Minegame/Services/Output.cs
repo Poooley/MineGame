@@ -8,7 +8,7 @@ public class Output : IOutput
     private readonly Settings _settings;
     private readonly int[] leftFields;
     private readonly int[] rightFields;   
-    private readonly IDictionary<EnabledKey, EnabledKeys> enabledKeys = KeysFactory.GetEnabledKeys();
+    private readonly IDictionary<EnabledKey, EnabledKeys> enabledKeys = KeysFactory.GetDefaultKeys();
     
     public Output(IOptionsSnapshot<Settings> settings = null)
     {
@@ -22,17 +22,10 @@ public class Output : IOutput
         bool leftNotAllowed = leftFields.Any(x => x == curPos);
         bool rightNotAllowed = rightFields.Any(x => x == curPos);
 
+        EnabledKeys keys = KeysFactory.GetEnabledKeys(enabledKeys, leftNotAllowed, rightNotAllowed);
+        
         while (true)
         {
-            EnabledKeys keys;
-
-            if (leftNotAllowed)
-                keys = enabledKeys[EnabledKey.Left];
-            else if (rightNotAllowed)
-                keys = enabledKeys[EnabledKey.Right];
-            else
-                keys = enabledKeys[EnabledKey.All];
-
             Console.WriteLine(keys.Description);
             
             // get Cursor keys input
