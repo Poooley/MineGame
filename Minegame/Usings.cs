@@ -1,3 +1,4 @@
-﻿global using Minegame.Interfaces;
-global using Minegame.Models;
+﻿global using Minegame.Models;
 global using Minegame.Services;
+global using Minegame.Factories;
+global using Minegame.Interfaces;

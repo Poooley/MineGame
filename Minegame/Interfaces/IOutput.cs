@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Minegame.Interfaces;
-interface IOutput
+public interface IOutput
 {
     int GetUserInput(int curPos);
     byte GetUserInputFirstRound();

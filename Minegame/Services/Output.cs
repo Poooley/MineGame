@@ -1,26 +1,22 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting.Internal;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Options;
+using Minegame.Factories;
+using System.Data.Common;
 
 namespace Minegame.Services;
-
-internal class Output : IOutput
+public class Output : IOutput
 {
     private readonly Settings _settings;
-    int[] leftFields;
-    int[] rightFields;
+    private readonly int[] leftFields;
+    private readonly int[] rightFields;   
+    private readonly IDictionary<EnabledKey, EnabledKeys> enabledKeys = KeysFactory.GetEnabledKeys();
+    
     public Output(IOptionsSnapshot<Settings> settings = null)
     {
         _settings = settings.Value;
-        leftFields = Enumerable.Range(0, _settings.Length).Select(x => (x * _settings.Width)).ToArray();
-        rightFields = Enumerable.Range(0, _settings.Length).Select(x => ((x * _settings.Width) + _settings.Width -1)).ToArray();
+        leftFields = ValidFieldsFactory.GetFields(MineColumn.Left, _settings);
+        rightFields = ValidFieldsFactory.GetFields(MineColumn.Right, _settings);
     }
-        
+    
     public int GetUserInput(int curPos)
     {
         bool leftNotAllowed = leftFields.Any(x => x == curPos);
@@ -28,39 +24,29 @@ internal class Output : IOutput
 
         while (true)
         {
-            var allowedKeys = new List<ConsoleKey>();
-            if (leftNotAllowed)
-            {
-                Console.Write($"\nWas ist Ihr nächster Zug? Pfeiltasten erlaubt: ► ▼ ");
-                allowedKeys.Add(ConsoleKey.RightArrow);
-                allowedKeys.Add(ConsoleKey.DownArrow);
-            }
-            else if (rightNotAllowed)
-            {
-                Console.Write($"\nWas ist Ihr nächster Zug? Pfeiltasten erlaubt: ◄ ▼ ");
-                allowedKeys.Add(ConsoleKey.LeftArrow);
-                allowedKeys.Add(ConsoleKey.DownArrow);
-            }
-            else
-            {
-                Console.Write($"\nWas ist Ihr nächster Zug? Pfeiltasten erlaubt: ◄ ▼ ► ");
-                allowedKeys.Add(ConsoleKey.RightArrow);
-                allowedKeys.Add(ConsoleKey.LeftArrow);
-                allowedKeys.Add(ConsoleKey.DownArrow);
-            }
+            EnabledKeys keys;
 
+            if (leftNotAllowed)
+                keys = enabledKeys[EnabledKey.Left];
+            else if (rightNotAllowed)
+                keys = enabledKeys[EnabledKey.Right];
+            else
+                keys = enabledKeys[EnabledKey.All];
+
+            Console.WriteLine(keys.Description);
+            
             // get Cursor keys input
             var key = Console.ReadKey(true);
 
-            if (!allowedKeys.Contains(key.Key))
+            if (!keys.Keys.Contains(key.Key))
                 continue;
-
+            
             return key.Key switch
             {
                 ConsoleKey.RightArrow => curPos + 1 + _settings.Width,
                 ConsoleKey.LeftArrow => curPos - 1 + _settings.Width,
                 ConsoleKey.DownArrow => curPos + _settings.Width,
-                _ => curPos
+                _ => throw new Exception("Unhandled key"),
             };
         }
     }
@@ -124,12 +110,7 @@ internal class Output : IOutput
     {
         var difficultyInPercent = Math.Round((double)_settings.Mines / _settings.Fields * 100, 0);
 
-        var difficulty = difficultyInPercent switch
-        {
-            > 10 => new Difficulty() { Name = "Schwer", Color = ConsoleColor.Red },
-            > 5 => new Difficulty() { Name = "Mittel", Color = ConsoleColor.Magenta },
-            _ => new Difficulty() { Name = "Leicht", Color = ConsoleColor.Yellow },
-        };
+        Difficulty difficulty = DifficultyFactory.GetDifficulty(difficultyInPercent);
 
         Console.ForegroundColor = difficulty.Color;
         Console.WriteLine($"Eingestellter Schwierigkeitsgrad: {difficulty.Name} {difficultyInPercent}%");
@@ -137,11 +118,5 @@ internal class Output : IOutput
         Console.ForegroundColor = ConsoleColor.Gray;
 
         Console.WriteLine("Das Spielfeld" + (showMines ? " inkl. Minen war:" : ":") + "\n");
-    }
-
-    class Difficulty
-    {
-        public string Name { get; set; }
-        public ConsoleColor Color { get; set; }
     }
 }

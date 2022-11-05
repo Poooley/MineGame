@@ -2,7 +2,7 @@
 
 namespace Minegame.Services;
 
-internal class GameManager : IGameManager
+public class GameManager : IGameManager
 {
     private readonly IOutput _console;
     private Settings _settings;
