@@ -25,13 +25,9 @@ public class GameManager : IGameManager
         Console.Write("\nNoch eine Runde? (j/n)? ");
 
         if (!Console.ReadLine().ToLower().Equals("n"))
-        {
             InitializeGame();
-        }
         else
-        {
             Environment.Exit(0);
-        }
     }
 
     public void Move(bool isFirstRound = true)

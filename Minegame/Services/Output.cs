@@ -1,39 +1,37 @@
 ﻿using Microsoft.Extensions.Options;
-using Minegame.Factories;
-using System.Data.Common;
 
 namespace Minegame.Services;
 public class Output : IOutput
 {
     private readonly Settings _settings;
     private readonly int[] leftFields;
-    private readonly int[] rightFields;   
+    private readonly int[] rightFields;
     private readonly IDictionary<EnabledKey, EnabledKeys> enabledKeys = KeysFactory.GetDefaultKeys();
-    
+
     public Output(IOptionsSnapshot<Settings> settings = null)
     {
         _settings = settings.Value;
         leftFields = ValidFieldsFactory.GetFields(MineColumn.Left, _settings);
         rightFields = ValidFieldsFactory.GetFields(MineColumn.Right, _settings);
     }
-    
+
     public int GetUserInput(int curPos)
     {
         bool leftNotAllowed = leftFields.Any(x => x == curPos);
         bool rightNotAllowed = rightFields.Any(x => x == curPos);
 
         EnabledKeys keys = KeysFactory.GetEnabledKeys(enabledKeys, leftNotAllowed, rightNotAllowed);
-        
+
         while (true)
         {
             Console.WriteLine(keys.Description);
-            
+
             // get Cursor keys input
             var key = Console.ReadKey(true);
 
             if (!keys.Keys.Contains(key.Key))
                 continue;
-            
+
             return key.Key switch
             {
                 ConsoleKey.RightArrow => curPos + 1 + _settings.Width,
@@ -94,9 +92,9 @@ public class Output : IOutput
                     Console.Write("X ");
                 }
             }
-            Console.ForegroundColor = ConsoleColor.Gray;
             Console.WriteLine();
         }
+        Console.ForegroundColor = ConsoleColor.Gray;
     }
 
     private void SetGameText(bool showMines)
