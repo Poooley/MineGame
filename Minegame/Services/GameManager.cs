@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using System.Threading;
 
 namespace Minegame.Services;
 
-public class GameManager : IGameManager
+public class GameManager : IHostedService
 {
     private readonly IOutput _console;
     private Settings _settings;
@@ -14,78 +16,28 @@ public class GameManager : IGameManager
         _console = console;
         _settings = settings.Value;
     }
-
-    public void Start()
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        InitializeGame();
-    }
+        Start:
+        await Task.Factory.StartNew(() => InitializeGame(), cancellationToken, 
+            TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
-    public void Stop()
-    {
         Console.Write("\nNoch eine Runde? (j/n)? ");
 
         if (!Console.ReadLine().ToLower().Equals("n"))
-            InitializeGame();
+            goto Start;
         else
-            Environment.Exit(0);
+            Console.WriteLine("Drücke Ctrl+C um das Programm zu schließen");
     }
-
-    public void Move(bool isFirstRound = true)
-    {
-        int lastPos = 0;
-        while (true)
-        {
-            Console.Clear();
-
-            _console.SetPlayingField(currentRow, fields);
-            
-            var curPos = isFirstRound ? _console.GetUserInputFirstRound() : _console.GetUserInput(lastPos);
-            
-            lastPos = curPos;
-            
-
-            fields[curPos].IsFlagged = true;
-
-            if (fields[curPos].IsMine)
-                IsLose();
-
-            if (currentRow == _settings.Length - 1)
-                IsWin();
-
-            isFirstRound = false;
-            currentRow++;
-        }
-    }
-    private void IsWin()
-    {
-        SetFinishText("Sie haben gewonnen! Glückwunsch!");
-        Stop();
-    }
-    private void IsLose()
-    {
-        SetFinishText("Sie haben leider verloren! Versuchen Sie es erneut!");
-        Stop();
-    }
-
-    private void SetFinishText(string text)
-    {
-        Console.Clear();
-        _console.SetPlayingField(_settings.Length - 1, fields, true);
-
-        Console.ForegroundColor = ConsoleColor.Magenta;
-        Console.WriteLine($"\n----- {text} -----");
-        Console.ForegroundColor = ConsoleColor.Gray;
-
-    }
-
+    
     private void InitializeGame()
     {
         fields = InitializeFields();
         currentRow = 0;
-        
+
         Move();
     }
-
     private Field[] InitializeFields()
     {
         var fields = new Field[_settings.Fields];
@@ -111,5 +63,48 @@ public class GameManager : IGameManager
         }
 
         return fields;
+    }
+    public void Move(bool isFirstRound = true)
+    {
+        int lastPos = 0;
+        while (true)
+        {
+            Console.Clear();
+
+            _console.SetPlayingField(currentRow, fields);
+            
+            var curPos = isFirstRound ? _console.GetUserInputFirstRound() : _console.GetUserInput(lastPos);
+            
+            lastPos = curPos;
+            
+
+            fields[curPos].IsFlagged = true;
+
+            if (fields[curPos].IsMine)
+            {
+                IsLose();
+                break;
+            }
+
+            if (currentRow == _settings.Length - 1)
+            {
+                IsWin();
+                break;
+            }
+
+            isFirstRound = false;
+            currentRow++;
+        }
+    }
+    private void IsWin() => SetFinishText("Sie haben gewonnen! Glückwunsch!");
+    private void IsLose() => SetFinishText("Sie haben leider verloren! Versuchen Sie es erneut!");
+    private void SetFinishText(string text)
+    {
+        Console.Clear();
+        _console.SetPlayingField(_settings.Length - 1, fields, true);
+
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine($"\n----- {text} -----");
+        Console.ForegroundColor = ConsoleColor.Gray;
     }
 }

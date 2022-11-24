@@ -6,22 +6,22 @@ using System.Configuration;
 namespace Minegame;
 internal class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args) => await CreateDefaultHostBuilder(args).Build().RunAsync();
+    private static IHostBuilder CreateDefaultHostBuilder(string[] args)
     {
-        using IHost host = Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration(config => config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true))
-            .ConfigureServices((context, services) =>
-            {
-                services.AddSingleton<IGameManager, GameManager>();
-                services.AddSingleton<IOutput, Output>();
-                services.Configure<Settings>(context.Configuration);
-                services.Configure<Settings>((settings) =>
-                {
-                    settings.Fields = settings.Length * settings.Width;
-                });
-            })
-            .Build();
+        return Host.CreateDefaultBuilder(args)
+                    .ConfigureAppConfiguration(config => config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true))
+                    .ConfigureServices((context, services) =>
+                    {
+                        services.AddSingleton<IOutput, Output>();
+                        services.Configure<Settings>(context.Configuration);
+                        services.Configure<Settings>((settings) =>
+                        {
+                            settings.Fields = settings.Length * settings.Width;
+                        });
 
-        host.Services.GetRequiredService<IGameManager>().Start();
+                        services.AddHostedService<GameManager>();
+                    });
+
     }
 }

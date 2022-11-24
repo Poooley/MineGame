@@ -1,0 +1,15 @@
+[33m5b5e4bb[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m HEAD@{0}: reset: moving to HEAD
+[33m5b5e4bb[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m HEAD@{1}: commit: small changes
+[33mb44431a[m HEAD@{2}: commit: changing code structure
+[33m1b071ad[m HEAD@{3}: commit: factories added, cleaner class structure
+[33mc994693[m HEAD@{4}: commit: adding factories and cleaner code
+[33m8b81823[m HEAD@{5}: commit: difficulty changes
+[33m33c8f8c[m HEAD@{6}: commit: playingField => \t
+[33m8bc0325[m HEAD@{7}: commit: byte => most times to int
+[33m8e9f503[m HEAD@{8}: commit: changed program structure to IOptionsSnapshot
+[33m4073846[m HEAD@{9}: commit: output changes
+[33m529e5a6[m HEAD@{10}: commit: colors
+[33mc3f0a06[m HEAD@{11}: pull: Fast-forward
+[33md2197df[m HEAD@{12}: commit: finished Minegame
+[33m57092b2[m HEAD@{13}: commit: Add project files.
+[33md19cc4d[m HEAD@{14}: commit (initial): Add .gitattributes, .gitignore, and README.md.
