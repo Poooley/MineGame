@@ -7,9 +7,9 @@ namespace Minegame.Services;
 public class GameManager : IHostedService
 {
     private readonly IOutput _console;
-    private Settings _settings;
-    private Field[] fields;
-    private int currentRow = 0;
+    private int _currentRow = 0;
+    private readonly Settings _settings;
+    private Field[] _fields;
     
     public GameManager(IOutput console, IOptionsSnapshot<Settings> settings = null)
     {
@@ -19,8 +19,8 @@ public class GameManager : IHostedService
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        Start:
-        await Task.Factory.StartNew(() => InitializeGame(), cancellationToken, 
+       Start:
+       await Task.Factory.StartNew(InitializeGame, cancellationToken, 
             TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         Console.Write("\nNoch eine Runde? (j/n)? ");
@@ -33,8 +33,8 @@ public class GameManager : IHostedService
     
     private void InitializeGame()
     {
-        fields = InitializeFields();
-        currentRow = 0;
+        _fields = InitializeFields();
+        _currentRow = 0;
 
         Move();
     }
@@ -71,29 +71,29 @@ public class GameManager : IHostedService
         {
             Console.Clear();
 
-            _console.SetPlayingField(currentRow, fields);
+            _console.SetPlayingField(_currentRow, _fields);
             
             var curPos = isFirstRound ? _console.GetUserInputFirstRound() : _console.GetUserInput(lastPos);
             
             lastPos = curPos;
             
 
-            fields[curPos].IsFlagged = true;
+            _fields[curPos].IsFlagged = true;
 
-            if (fields[curPos].IsMine)
+            if (_fields[curPos].IsMine)
             {
                 IsLose();
                 break;
             }
 
-            if (currentRow == _settings.Length - 1)
+            if (_currentRow == _settings.Length - 1)
             {
                 IsWin();
                 break;
             }
 
             isFirstRound = false;
-            currentRow++;
+            _currentRow++;
         }
     }
     private void IsWin() => SetFinishText("Sie haben gewonnen! Glückwunsch!");
@@ -101,7 +101,7 @@ public class GameManager : IHostedService
     private void SetFinishText(string text)
     {
         Console.Clear();
-        _console.SetPlayingField(_settings.Length - 1, fields, true);
+        _console.SetPlayingField(_settings.Length - 1, _fields, true);
 
         Console.ForegroundColor = ConsoleColor.Magenta;
         Console.WriteLine($"\n----- {text} -----");
