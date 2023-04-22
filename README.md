@@ -15,9 +15,9 @@ You can change the game settings by editing the appsettings.json file. The follo
 
 ```json
 {
-  "Length": 10,   // Number of rows on the game board
-  "Width": 15,    // Number of columns on the game board
-  "Mines": 10     // Number of mines on the game board (percentage of tiles)
+  "Length": 10,
+  "Width": 15,
+  "Mines": 10
 }
 ```
 
